@@ -1,4 +1,5 @@
 from ai_debate.models import DebateState, ModeratorDecision, Speech, Verdict
+from ai_debate.utils import list_to_str
 
 
 MAX_TURNS_REASON = "Maximum debate turns reached; entering closing arguments."
@@ -35,7 +36,7 @@ class EventLog:
                 "speaker": speech.speaker.value,
                 "phase": speech.phase.value,
                 "round": speech.round,
-                "content": speech.content,
+                "content": list_to_str(speech.content),
             }
         )
 

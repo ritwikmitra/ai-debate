@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 
 from .common_models import DebatePhase, Speaker, Action
 from .output_models import Speech, Verdict, ModeratorDecision
+from ..utils import list_to_str
 
 
 class DebateState(BaseModel):
@@ -24,9 +25,10 @@ class DebateState(BaseModel):
 
         chunks = []
         for speech in self.speeches:
+            speech_content = list_to_str(speech.content)
             chunks.append(
                 f"[Round {speech.round} | {speech.phase.value.upper()} | "
-                f"{speech.speaker.value.upper()}]\n{speech.content}"
+                f"{speech.speaker.value.upper()}]\n{speech_content}"
             )
         return "\n\n".join(chunks)
 

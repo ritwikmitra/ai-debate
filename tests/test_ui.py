@@ -1,5 +1,6 @@
 from ai_debate.ui.event_formatter import EventFormatter
 from ai_debate.ui.app import create_app
+from ai_debate.ui.styles import CHATBOT_CSS
 
 
 def test_format_speech_shows_speaker_phase_and_content():
@@ -78,6 +79,9 @@ def test_transcript_keeps_consecutive_agent_messages_separate():
 
     assert chatbot_config["props"]["group_consecutive_messages"] is False
     assert chatbot_config["props"]["sanitize_html"] is False
+    assert chatbot_config["props"]["elem_id"] == "debate-transcript"
+    assert "#debate-transcript .message.bot" in CHATBOT_CSS
+    assert "border: none" in CHATBOT_CSS
 
 
 def test_word_limit_control_defaults_to_150():

@@ -6,6 +6,7 @@ import gradio as gr
 
 from ai_debate.engine.debate import DebateEngine
 from ai_debate.ui.event_formatter import EventFormatter
+from ai_debate.ui.styles import CHATBOT_CSS
 
 
 DEFAULT_MODEL = "gpt-5.6-luna"
@@ -87,6 +88,7 @@ def create_app() -> gr.Blocks:
             with gr.Column(scale=2):
                 transcript = gr.Chatbot(
                     label="Debate transcript",
+                    elem_id="debate-transcript",
                     height=720,
                     render_markdown=True,
                     sanitize_html=False,
@@ -110,7 +112,7 @@ def create_app() -> gr.Blocks:
 
 
 def main() -> None:
-    create_app().launch()
+    create_app().launch(css=CHATBOT_CSS)
 
 
 if __name__ == "__main__":

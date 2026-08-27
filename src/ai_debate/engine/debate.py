@@ -1,3 +1,5 @@
+from agents import trace
+
 from ai_debate.debate_agents import (
     create_anti_speaker,
     create_judge,
@@ -51,28 +53,29 @@ class DebateEngine:
         self.verdict = VerdictFlow(self.state, self.agents.final_judge, self.events)
 
     async def run(self):
-        while not self.state.debate_ended:
-            if self._turn_limit_reached():
-                forced_closing = await self._force_closing_arguments()
-                self.state.debate_ended = True
+        with trace("AI Debate"):
+            while not self.state.debate_ended:
+                if self._turn_limit_reached():
+                    forced_closing = await self._force_closing_arguments()
+                    self.state.debate_ended = True
 
-                if forced_closing:
-                    yield self.state
+                    if forced_closing:
+                        yield self.state
 
-                break
+                    break
 
-            decision = await self.moderator.decide()
+                decision = await self.moderator.decide()
+                yield self.state
+
+                if decision.next_action == Action.END_DEBATE:
+                    self.state.debate_ended = True
+                    break
+
+                await self.speeches.execute(decision.next_action)
+                yield self.state
+
+            await self.verdict.run()
             yield self.state
-
-            if decision.next_action == Action.END_DEBATE:
-                self.state.debate_ended = True
-                break
-
-            await self.speeches.execute(decision.next_action)
-            yield self.state
-
-        await self.verdict.run()
-        yield self.state
 
     def _turn_limit_reached(self) -> bool:
         return self.state.turn_count >= self.max_turns

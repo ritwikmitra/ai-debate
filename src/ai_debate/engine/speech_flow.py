@@ -93,7 +93,7 @@ class SpeechFlow:
         )
 
         speech: Speech = result.final_output
-        speech.content = self._limit_words(speech.content)
+        speech.content = speech.content
         speech.speaker = speaker
         speech.phase = phase
         speech.round = self.state.round
@@ -105,6 +105,7 @@ class SpeechFlow:
 
         return self.state.last_moderator_decision.focus_points
 
+    # Unused
     def _limit_words(self, content: str) -> str:
         return " ".join(content.split()[: self.max_words])
 

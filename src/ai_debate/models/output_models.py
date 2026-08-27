@@ -7,7 +7,7 @@ class Speech(BaseModel):
     speaker: Speaker
     phase: DebatePhase
     round: int
-    content: str
+    content: list[str] = Field(default_factory=list)
     key_arguments: list[str] = Field(default_factory=list)
     rebuttals: list[str] = Field(default_factory=list)
 
