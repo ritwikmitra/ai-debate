@@ -1,0 +1,115 @@
+ # AI Debate
+
+AI Debate is a Gradio application in which multiple AI agents conduct a
+structured debate. Two speaker agents argue for and against a motion, a
+moderator decides which argument or closing statement should come next, and a
+final judge evaluates the complete transcript and declares a winner. The UI
+streams moderator decisions, speeches, and the final verdict as they are
+produced.
+
+## Requirements
+
+Required:
+
+- Python 3.12 or newer.
+- An API key for the model provider used by the OpenAI Agents SDK. For the
+  default OpenAI setup, this is `OPENAI_API_KEY`.
+- Network access to the configured model provider.
+- Project dependencies installed from `pyproject.toml`.
+
+Recommended, but optional:
+
+- [uv](https://docs.astral.sh/uv/) for managing the Python environment and
+  dependencies.
+- A `.env` file in the project root. The application loads it automatically
+  when started with the `ai-debate` command. `.env` is ignored by Git, so do
+  not commit credentials.
+- The development dependency group, which includes `pytest`, if you want to
+  run the test suite.
+
+## Configuration
+
+### Environment
+
+Create a `.env` file in the project root or export the variable in your shell:
+
+```dotenv
+OPENAI_API_KEY=your_api_key_here
+```
+
+The application does not contain a default API key. The `ai-debate` entry
+point calls `load_dotenv()` before launching the UI, and existing shell
+environment variables take precedence over values in `.env`.
+
+The model names must be valid for the provider and account being used. The
+default model name in the UI is `gpt-5.6-luna`; replace it with an available
+model if that name is not enabled for your account.
+
+### Debate controls
+
+These values are set in the Gradio UI for each run:
+
+| Parameter | Default | Allowed range / purpose |
+| --- | ---: | --- |
+| Motion | `This house believes that AI will improve education more than it harms it.` | The proposition being debated; it must not be blank. |
+| Pro model | `gpt-5.6-luna` | Model used by the speaker arguing for the motion. |
+| Anti model | `gpt-5.6-luna` | Model used by the speaker arguing against the motion. |
+| Moderator model | `gpt-5.6-luna` | Model that chooses the next debate action. |
+| Judge model | `gpt-5.6-luna` | Model that produces the final verdict. |
+| Maximum speeches | `10` | Integer from `2` to `20`; the engine ends normal debate turns at this limit and ensures missing closings are requested. |
+| Maximum words per speech | `150` | Integer from `50` to `500`; each generated speech is truncated to this limit. |
+
+To change the initial motion, default model, or slider defaults, edit
+`DEFAULT_MOTION`, `DEFAULT_MODEL`, and the corresponding component definitions
+in `src/ai_debate/ui/app.py`. Model assignments can also be changed directly
+in the UI without editing code.
+
+## Installation
+
+Using uv (recommended):
+
+```bash
+uv sync
+```
+
+Without uv, create and activate a Python 3.12+ virtual environment and install
+the package with pip:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate       # Windows: .venv\Scripts\activate
+python -m pip install -e .
+```
+
+The runtime dependencies are Gradio, OpenAI Agents, Pydantic, and
+`python-dotenv`. The test dependency is optional and is included in the uv
+development environment; with pip it can be installed separately:
+
+```bash
+python -m pip install pytest
+```
+
+## Running the application
+
+1. Set `OPENAI_API_KEY` in the environment or in `.env`.
+2. Start the application from the project root:
+
+```bash
+uv run ai-debate
+```
+
+If the package was installed with pip, run:
+
+```bash
+ai-debate
+```
+
+Gradio prints a local URL, usually `http://127.0.0.1:7860`. Open it in a
+browser, enter or adjust the motion and model names, and select **Start
+debate**. The browser must remain connected while the transcript is streaming.
+
+To run the optional tests:
+
+```bash
+uv run pytest
+```
