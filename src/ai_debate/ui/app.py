@@ -7,12 +7,17 @@ import gradio as gr
 from ai_debate.engine.debate import DebateEngine
 from ai_debate.ui.event_formatter import EventFormatter
 from ai_debate.ui.styles import CHATBOT_CSS
+from ai_debate.utils import get_env_int, get_env_list, get_env_str
 
-DEFAULT_MODEL = "gpt-5.6-luna"
-AVAILABLE_MODELS = (
-    DEFAULT_MODEL,
-    "gpt-5-nano",
-)
+
+DEFAULT_MODEL = get_env_str("DEFAULT_MODEL", "gpt-5-nano")
+AVAILABLE_MODELS = get_env_list("AVAILABLE_MODELS", "gpt-5-nano")
+MIN_TURNS = get_env_int("MIN_TURNS", 2)
+MAX_TURNS = get_env_int("MAX_TURNS", 20)
+MIN_WORDS = get_env_int("MIN_WORDS", 50)
+MAX_WORDS = get_env_int("MAX_WORDS", 500)
+DEFAULT_TURNS = min(max(10, MIN_TURNS), MAX_TURNS)
+DEFAULT_WORDS = min(max(150, MIN_WORDS), MAX_WORDS)
 DEFAULT_MOTION = "This house believes that AI will improve education more than it harms it."
 
 
@@ -107,16 +112,16 @@ def create_app() -> gr.Blocks:
                     )
                     max_turns = gr.Slider(
                         label="Maximum speeches",
-                        minimum=2,
-                        maximum=20,
-                        value=10,
+                        minimum=MIN_TURNS,
+                        maximum=MAX_TURNS,
+                        value=DEFAULT_TURNS,
                         step=1,
                     )
                     max_words = gr.Slider(
                         label="Maximum words per speech",
-                        minimum=50,
-                        maximum=500,
-                        value=150,
+                        minimum=MIN_WORDS,
+                        maximum=MAX_WORDS,
+                        value=DEFAULT_WORDS,
                         step=10,
                     )
                     start = gr.Button("Start debate", variant="primary")

@@ -41,10 +41,27 @@ The application does not contain a default API key. The `ai-debate` entry
 point calls `load_dotenv()` before launching the UI, and existing shell
 environment variables take precedence over values in `.env`.
 
-The UI exposes a fixed, budget-conscious allowlist of model names so users
-cannot enter an arbitrary or unexpectedly expensive model. The default model
-is `gpt-5.6-luna`; update `AVAILABLE_MODELS` and `DEFAULT_MODEL` in
-`src/ai_debate/ui/app.py` if the provider configuration changes.
+The UI exposes a budget-conscious allowlist of model names so users cannot
+enter an arbitrary or unexpectedly expensive model. Configure the models with
+comma-separated environment values:
+
+```dotenv
+DEFAULT_MODEL=gpt-5-nano
+AVAILABLE_MODELS=gpt-5-nano,gpt-4.1-nano,gpt-5.6-luna
+```
+
+`DEFAULT_MODEL` is selected initially for each participant. The default for
+both values is only `gpt-5-nano`. Existing shell environment variables take
+precedence over `.env` values.
+
+The slider bounds can also be configured:
+
+```dotenv
+MIN_TURNS=2
+MAX_TURNS=20
+MIN_WORDS=50
+MAX_WORDS=500
+```
 
 ### Debate controls
 
@@ -57,16 +74,15 @@ These values are set in the Gradio UI for each run:
 | Anti model | Dropdown | Model used by the speaker arguing against the motion. |
 | Moderator model | Dropdown | Model that chooses the next debate action. |
 | Judge model | Dropdown | Model that produces the final verdict. |
-| Maximum speeches | `10` | Integer from `2` to `20`; the engine ends normal debate turns at this limit and ensures missing closings are requested. |
-| Maximum words per speech | `150` | Integer from `50` to `500`; each generated speech is truncated to this limit. |
+| Maximum speeches | `10` | Integer from `MIN_TURNS` to `MAX_TURNS`; the engine ends normal debate turns at this limit and ensures missing closings are requested. |
+| Maximum words per speech | `150` | Integer from `MIN_WORDS` to `MAX_WORDS`; each generated speech is truncated to this limit. |
 
 The motion, model assignments, and slider controls are grouped in an expandable
 Debate settings panel. The settings sidebar hides when a debate starts so the
 transcript can use the full width, and can be restored with the Show settings
-button. To change the initial motion, permitted models,
-default model, or slider defaults, edit `DEFAULT_MOTION`, `AVAILABLE_MODELS`,
-`DEFAULT_MODEL`, and the corresponding component definitions in
-`src/ai_debate/ui/app.py`.
+button. To change the initial motion, edit `DEFAULT_MOTION` in
+`src/ai_debate/ui/app.py`. Models and slider bounds should be configured
+through environment variables or `.env`.
 
 ## Installation
 
