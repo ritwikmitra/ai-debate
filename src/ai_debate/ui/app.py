@@ -8,8 +8,11 @@ from ai_debate.engine.debate import DebateEngine
 from ai_debate.ui.event_formatter import EventFormatter
 from ai_debate.ui.styles import CHATBOT_CSS
 
-
 DEFAULT_MODEL = "gpt-5.6-luna"
+AVAILABLE_MODELS = (
+    DEFAULT_MODEL,
+    "gpt-5-nano",
+)
 DEFAULT_MOTION = "This house believes that AI will improve education more than it harms it."
 
 
@@ -21,10 +24,24 @@ async def run_debate(
     judge_model: str,
     max_turns: int,
     max_words: int,
-) -> AsyncGenerator[list[dict[str, str]], None]:
+) -> AsyncGenerator[
+    tuple[list[dict[str, str]], dict[str, object], dict[str, object]], None
+]:
     """Run the engine and stream each newly recorded event to the chat."""
     if not motion.strip():
         raise gr.Error("Enter a motion before starting the debate.")
+
+    selected_models = {
+        "Pro model": pro_model,
+        "Anti model": anti_model,
+        "Moderator model": moderator_model,
+        "Judge model": judge_model,
+    }
+    invalid_models = [
+        role for role, model in selected_models.items() if model not in AVAILABLE_MODELS
+    ]
+    if invalid_models:
+        raise gr.Error("Select a permitted model for every debate participant.")
 
     engine = DebateEngine(
         motion=motion.strip(),
@@ -42,14 +59,14 @@ async def run_debate(
         }
     ]
     event_index = 0
-    yield chat_history
+    yield chat_history, gr.update(visible=False), gr.update(visible=True)
 
     async for state in engine.run():
         new_events = state.events[event_index:]
         chat_history.extend(EventFormatter.format_event(event) for event in new_events)
         event_index += len(new_events)
         if new_events:
-            yield chat_history
+            yield chat_history, gr.skip(), gr.skip()
 
 
 def create_app() -> gr.Blocks:
@@ -57,35 +74,58 @@ def create_app() -> gr.Blocks:
     with gr.Blocks(title="AI Debate") as app:
         gr.Markdown("# AI Debate")
         with gr.Row():
-            with gr.Column(scale=1, min_width=320):
-                motion = gr.Textbox(
-                    label="Motion",
-                    value=DEFAULT_MOTION,
-                    lines=4,
-                )
-                with gr.Accordion("Participants", open=True):
-                    pro_model = gr.Textbox(label="Pro model", value=DEFAULT_MODEL)
-                    anti_model = gr.Textbox(label="Anti model", value=DEFAULT_MODEL)
-                    moderator_model = gr.Textbox(
-                        label="Moderator model", value=DEFAULT_MODEL
+            with gr.Column(scale=1, min_width=320) as settings_sidebar:
+                with gr.Accordion("Debate settings", open=True):
+                    motion = gr.Textbox(
+                        label="Motion",
+                        value=DEFAULT_MOTION,
+                        lines=4,
                     )
-                    judge_model = gr.Textbox(label="Judge model", value=DEFAULT_MODEL)
-                max_turns = gr.Slider(
-                    label="Maximum speeches",
-                    minimum=2,
-                    maximum=20,
-                    value=10,
-                    step=1,
-                )
-                max_words = gr.Slider(
-                    label="Maximum words per speech",
-                    minimum=50,
-                    maximum=500,
-                    value=150,
-                    step=10,
-                )
-                start = gr.Button("Start debate", variant="primary")
+                    pro_model = gr.Dropdown(
+                        choices=AVAILABLE_MODELS,
+                        label="Pro model",
+                        value=DEFAULT_MODEL,
+                        allow_custom_value=False,
+                    )
+                    anti_model = gr.Dropdown(
+                        choices=AVAILABLE_MODELS,
+                        label="Anti model",
+                        value=DEFAULT_MODEL,
+                        allow_custom_value=False,
+                    )
+                    moderator_model = gr.Dropdown(
+                        choices=AVAILABLE_MODELS,
+                        label="Moderator model",
+                        value=DEFAULT_MODEL,
+                        allow_custom_value=False,
+                    )
+                    judge_model = gr.Dropdown(
+                        choices=AVAILABLE_MODELS,
+                        label="Judge model",
+                        value=DEFAULT_MODEL,
+                        allow_custom_value=False,
+                    )
+                    max_turns = gr.Slider(
+                        label="Maximum speeches",
+                        minimum=2,
+                        maximum=20,
+                        value=10,
+                        step=1,
+                    )
+                    max_words = gr.Slider(
+                        label="Maximum words per speech",
+                        minimum=50,
+                        maximum=500,
+                        value=150,
+                        step=10,
+                    )
+                    start = gr.Button("Start debate", variant="primary")
             with gr.Column(scale=2):
+                show_settings = gr.Button(
+                    "Show settings",
+                    variant="secondary",
+                    visible=False,
+                )
                 transcript = gr.Chatbot(
                     label="Debate transcript",
                     elem_id="debate-transcript",
@@ -106,7 +146,12 @@ def create_app() -> gr.Blocks:
                 max_turns,
                 max_words,
             ],
-            outputs=transcript,
+            outputs=[transcript, settings_sidebar, show_settings],
+        )
+
+        show_settings.click(
+            fn=lambda: (gr.update(visible=True), gr.update(visible=False)),
+            outputs=[settings_sidebar, show_settings],
         )
     return app
 

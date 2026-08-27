@@ -81,6 +81,7 @@ def test_transcript_keeps_consecutive_agent_messages_separate():
     assert chatbot_config["props"]["sanitize_html"] is False
     assert chatbot_config["props"]["elem_id"] == "debate-transcript"
     assert "#debate-transcript .message.bot" in CHATBOT_CSS
+    assert "#debate-transcript .message.user" in CHATBOT_CSS
     assert "border: none" in CHATBOT_CSS
 
 
