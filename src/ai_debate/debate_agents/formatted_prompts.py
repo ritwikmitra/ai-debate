@@ -27,9 +27,6 @@ MOTION:
 CURRENT PHASE:
 {state.phase.value}
 
-CURRENT ROUND:
-{state.round}
-
 TURN COUNT:
 {state.turn_count}
 
@@ -91,9 +88,6 @@ YOU ARE:
 
 DEBATE PHASE:
 {state.phase.value}
-
-CURRENT ROUND:
-{state.round}
 
 PREVIOUS DEBATE:
 {state.transcript()}

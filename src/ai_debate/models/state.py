@@ -27,8 +27,8 @@ class DebateState(BaseModel):
         for speech in self.speeches:
             speech_content = list_to_str(speech.content)
             chunks.append(
-                f"[Round {speech.round} | {speech.phase.value.upper()} | "
-                f"{speech.speaker.value.upper()}]\n{speech_content}"
+                f"[{speech.phase.value.upper()} | {speech.speaker.value.upper()}]\n"
+                f"{speech_content}"
             )
         return "\n\n".join(chunks)
 

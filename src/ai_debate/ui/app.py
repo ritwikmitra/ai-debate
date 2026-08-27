@@ -7,7 +7,7 @@ import gradio as gr
 from ai_debate.engine.debate import DebateEngine
 from ai_debate.ui.event_formatter import EventFormatter
 from ai_debate.ui.styles import CHATBOT_CSS
-from ai_debate.utils import get_env_int, get_env_list, get_env_str
+from ai_debate.utils import get_env_bool, get_env_int, get_env_list, get_env_str
 
 
 DEFAULT_MODEL = get_env_str("DEFAULT_MODEL", "gpt-5-nano")
@@ -18,6 +18,7 @@ MIN_WORDS = get_env_int("MIN_WORDS", 50)
 MAX_WORDS = get_env_int("MAX_WORDS", 500)
 DEFAULT_TURNS = min(max(10, MIN_TURNS), MAX_TURNS)
 DEFAULT_WORDS = min(max(150, MIN_WORDS), MAX_WORDS)
+GRADIO_SHARE = get_env_bool("GRADIO_SHARE")
 DEFAULT_MOTION = "This house believes that AI will improve education more than it harms it."
 
 
@@ -162,7 +163,7 @@ def create_app() -> gr.Blocks:
 
 
 def main() -> None:
-    create_app().launch(css=CHATBOT_CSS)
+    create_app().launch(css=CHATBOT_CSS, share=GRADIO_SHARE)
 
 
 if __name__ == "__main__":

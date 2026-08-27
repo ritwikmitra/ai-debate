@@ -18,7 +18,8 @@ def test_format_speech_shows_speaker_phase_and_content():
     assert "background-color: #e8f1ff" in message["content"]
     assert 'style="color: #123d70 !important;"' in message["content"]
     assert "Pro Speaker" in message["content"]
-    assert "Rebuttal | Round 3" in message["content"]
+    assert "Rebuttal" in message["content"]
+    assert "Round" not in message["content"]
     assert "A direct response." in message["content"]
 
 

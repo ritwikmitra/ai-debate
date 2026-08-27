@@ -1,4 +1,11 @@
- # AI Debate
+---
+title: AI_Debate
+app_file: app.py
+sdk: gradio
+sdk_version: 6.26.0
+---
+
+# AI Debate
 
 AI Debate is a Gradio application in which multiple AI agents conduct a
 structured debate. Two speaker agents argue for and against a motion, a
@@ -61,6 +68,13 @@ MIN_TURNS=2
 MAX_TURNS=20
 MIN_WORDS=50
 MAX_WORDS=500
+```
+
+To enable a shareable Gradio URL, set sharing explicitly. It is disabled by
+default:
+
+```dotenv
+GRADIO_SHARE=true
 ```
 
 ### Debate controls

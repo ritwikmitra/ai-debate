@@ -27,7 +27,7 @@ class EventFormatter:
                     event["speaker"],
                     f"{speaker} Speaker",
                     event["content"],
-                    f"{phase} | Round {event['round'] + 1}",
+                    phase,
                 ),
             }
 
